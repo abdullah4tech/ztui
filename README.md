@@ -49,7 +49,7 @@ frame.render(area, buf);
 ## Install
 
 ```sh
-zig fetch --save https://github.com/abdullah4tech/ztui/archive/refs/heads/main.tar.gz
+zig fetch --save https://github.com/abdullah4tech/ztui/archive/refs/tags/v0.1.0.tar.gz
 ```
 
 ```zig
