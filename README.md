@@ -88,6 +88,11 @@ you — the same idea as `npm create vite@latest`, just for a Zig TUI.
 | `Block`     | A bordered, optionally-titled frame. Call `.inner(area)` to get the content area for whatever you render next. |
 | `Paragraph` | Styled, word-wrapped text with left/center/right alignment. |
 | `List`      | A vertical list of items with a selectable, auto-scrolling highlight. |
+| `Gauge`     | A horizontal progress/usage bar (CPU, memory, disk, download progress) with a centered label. |
+| `Sparkline` | A single-row trend line rendered in Unicode block characters — CPU/network/latency history. |
+| `Table`     | Columnar data with an optional header and a selectable, scrolling highlight. Column widths use `Constraint`, same as `split()`. Its `render` takes an allocator and returns `!void` since column sizing goes through `split()`. |
+| `Tabs`      | A horizontal tab bar for switching between views. |
+| `Scrollbar` | A vertical scroll-position indicator to pair with `List` / `Table` / `Paragraph`. |
 
 ```zig
 const rows = try ztui.split(allocator, area, .vertical, &.{
@@ -105,30 +110,33 @@ zig build run-dashboard   # composed layout: header, list, detail pane, footer
 ```
 
 `dashboard` looks roughly like this (colors and live selection only show up
-in a real terminal — run it to see it properly):
+in a real terminal — run it to see it properly). The system panel on the
+right is real data, sampled from `/proc/meminfo` and `/proc/loadavg` each
+frame, not a mockup:
 
 ```
-┌────────────────────────────────────────────────────────────┐
-│           ztui — a small terminal UI toolkit for Zig        │
-├───────────────────┬──────────────────────────────────────────┤
-│ menu              │ details                                  │
-│ ❯ Overview        │ ztui renders into an in-memory cell      │
-│   Buffers         │ buffer, diffs it against the previous    │
-│   Widgets         │ frame, and writes only what changed      │
-│   Layout engine   │ to the terminal.                         │
-│   Terminal backend│                                          │
-│   Examples        │                                          │
-└───────────────────┴──────────────────────────────────────────┘
-                 ↑/↓ or j/k to move   q to quit
+┌──────────────────────────────────────────────────────────────────────────┐
+│                  ztui — a small terminal UI toolkit for Zig               │
+├───────────────┬──────────────────────────────────┬───────────────────────┤
+│ menu          │ details                          │ system                │
+│ ❯ Overview    │ ztui renders into an in-memory   │ memory                │
+│   Buffers     │ cell buffer, diffs it against    │        52%            │
+│   Widgets     │ the previous frame, and writes   │                       │
+│   Layout      │ only what changed to the         │ load avg (1m)         │
+│   Terminal    │ terminal.                        │            ██████████ │
+│   Examples    │                                  │                       │
+└───────────────┴──────────────────────────────────┴───────────────────────┘
+                       ↑/↓ or j/k to move   q to quit
 ```
 
 ## Project status
 
-This is v0.1: the core primitives (buffer, layout, terminal backend, three
-widgets) work and are tested, but the widget set is intentionally small.
-Not yet implemented: rich multi-style text spans, more widgets (Table,
-Gauge, Chart, Tabs), mouse input, and a Windows console backend — raw mode
-and the alternate screen are currently POSIX-only (Linux/macOS).
+This is v0.1: the core primitives (buffer, layout, terminal backend) and
+eight widgets (`Block`, `Paragraph`, `List`, `Gauge`, `Sparkline`, `Table`,
+`Tabs`, `Scrollbar`) work and are tested. Not yet implemented: rich
+multi-style text spans, a Chart/BarChart widget, mouse input, and a Windows
+console backend — raw mode and the alternate screen are currently
+POSIX-only (Linux/macOS).
 
 ## License
 
