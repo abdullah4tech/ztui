@@ -94,18 +94,21 @@ pub fn split(
                 fill_used += share;
             }
         }
-    }
 
-    // Anything left over (rounding, or no fill segments at all) goes to the
-    // last non-`max` segment so the layout always covers the full area.
-    const leftover_pool = remaining - fill_used;
-    if (leftover_pool > 0) {
-        var i = constraints.len;
-        while (i > 0) {
-            i -= 1;
-            if (constraints[i] != .max) {
-                sizes[i] += @intCast(leftover_pool);
-                break;
+        // Integer division can leave a few units unassigned; give them to
+        // the last fill segment so the fill segments together cover all of
+        // `remaining`. `length`/`percentage`/`min` stay exactly as sized —
+        // with no fill segment at all, unclaimed space is simply left as a
+        // trailing gap rather than silently stretching a fixed constraint.
+        const rounding_leftover = remaining - fill_used;
+        if (rounding_leftover > 0) {
+            var i = constraints.len;
+            while (i > 0) {
+                i -= 1;
+                if (constraints[i] == .fill) {
+                    sizes[i] += @intCast(rounding_leftover);
+                    break;
+                }
             }
         }
     }
